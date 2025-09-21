@@ -44,7 +44,7 @@ INSTALLED_APPS = [
     # QUOTAS
     "django_quotas",
     "django_quotas.defaults",  # Use default quota model
-    "django_quotas.impl_db",  # Use DB-based quota service implementation
+    "django_quotas.backends.db",  # Use DB-based quota service implementation
 ]
 
 MIDDLEWARE = [
@@ -131,5 +131,5 @@ DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
 # QUOTAS CONFIGURATION
 # --------------------
-DJANGO_QUOTAS_QUOTA_SERVICE = "django_quotas.impl_db.DbQuotaService"
+DJANGO_QUOTAS_QUOTA_SERVICE = "django_quotas.backends.db.DbQuotaService"
 DJANGO_QUOTAS_QUOTA_RELATED_ACCOUNT_MODEL_NAME = AUTH_USER_MODEL

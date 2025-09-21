@@ -9,7 +9,7 @@ from django.conf import settings
 from django_quotas.utils import get_model_by_name
 
 if TYPE_CHECKING:
-    from django_quotas.impl_db.models import QuotaUsageModel
+    from django_quotas.backends.db.models import QuotaUsageModel
 
 
 __all__ = ["__DjangoQuotasDbConfig", "DjangoQuotasDbConfig"]
@@ -26,7 +26,7 @@ class __DjangoQuotasDbConfig:
 
         @return: Model name string.
         """
-        return getattr(settings, f"{self.SETTINGS_PREFIX}_IMPL_DB_USAGE_MODEL_NAME", "django_quotas_db.QuotaUsageModel")
+        return getattr(settings, f"{self.SETTINGS_PREFIX}_DB_USAGE_MODEL_NAME", "django_quotas_db.QuotaUsageModel")
 
     @cached_property
     def quota_usage_cls(self) -> type["QuotaUsageModel"]:

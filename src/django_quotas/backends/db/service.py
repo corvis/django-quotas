@@ -10,11 +10,11 @@ from asgiref.sync import sync_to_async
 from django.db import transaction
 from django.db.models import F, Sum
 
+from django_quotas.backends.db.config import DjangoQuotasDbConfig as cfg_db
+from django_quotas.backends.db.models import QuotaUsageModel
 from django_quotas.base.dto import Quota, QuotaStats, QuotaStatus, ValuePerBucket
 from django_quotas.base.service import QuotaService
 from django_quotas.config import DjangoQuotasConfig as cfg
-from django_quotas.impl_db.config import DjangoQuotasDbConfig as cfg_db
-from django_quotas.impl_db.models import QuotaUsageModel
 from django_quotas.models import BaseQuotaModel
 from django_quotas.utils import datetime_now
 

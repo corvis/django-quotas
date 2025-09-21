@@ -8,10 +8,10 @@ from django.utils.translation import gettext_lazy as gt
 
 
 class QuotasDbConfig(AppConfig):
-    """Django AppConfig for the django_quotas.impl_db application."""
+    """Django AppConfig for the django_quotas.backend.sdb application."""
 
     default_auto_field = "django.db.models.BigAutoField"
-    name = "django_quotas.impl_db"
+    name = "django_quotas.backends.db"
     label = "django_quotas_db"
-    verbose_name = gt("Quotas DB Impl")
+    verbose_name = gt("Quotas DB Backend")
     default = True

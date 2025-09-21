@@ -4,8 +4,8 @@
 from django.contrib import admin
 from django.http import HttpRequest
 
+from django_quotas.backends.db.models import QuotaUsageModel
 from django_quotas.config import DjangoQuotasConfig as cfg
-from django_quotas.impl_db.models import QuotaUsageModel
 
 
 @admin.register(QuotaUsageModel)

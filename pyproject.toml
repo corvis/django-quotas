@@ -1,10 +1,10 @@
 [project]
 name = "django-quotas"
-version = "1.0.0"
+version = "0.0.1"
 license = { text = "MIT" }
 description = ""
-authors = [{ name = "Dmitry Berezovsky", email = "unikit-dev@googlegroups.com" }]
-autmaintainershors = [{ name = "Dmitry Berezovsky", email = "unikit-dev@googlegroups.com" }]
+authors = [{ name = "Dmitry Berezovsky", email = "django-quotas-dev@googlegroups.com" }]
+autmaintainershors = [{ name = "Dmitry Berezovsky", email = "django-quotas-dev@googlegroups.com" }]
 keywords = ["django", "plans", "accounts", "quota"]
 classifiers = [
     "Development Status :: 3 - Alpha",
@@ -27,6 +27,10 @@ repository = "https://github.com/corvis/django-quotas"
 [tool.poetry]
 packages = [{ include = "django_quotas", from = "src" }]
 exclude = ["src/django_quotas/**/test_*", "src/django_quotas/**/tests"]
+
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"
 
 [dependency-groups.dev]
 # Unit tests

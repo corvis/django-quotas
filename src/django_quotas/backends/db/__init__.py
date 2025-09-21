@@ -3,7 +3,7 @@
 #
 """Database-backed implementation subpackage for django_quotas.
 
-@package django_quotas.impl_db
+@package django_quotas.backend.db
 """
 
 __all__ = []
