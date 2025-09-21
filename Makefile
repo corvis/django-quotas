@@ -22,9 +22,14 @@ else
     SED_COMMAND := sed
 endif
 
+# Helper function to activate virtual environment if not skipped
+define activate_venv
+  if [ -z $(SKIP_VENV) ]; then source $(VIRTUAL_ENV_PATH)/bin/activate; fi;
+endef
+
 pre_commit_hook:
 	@( \
-		if [ -z $(SKIP_VENV) ]; then source $(VIRTUAL_ENV_PATH)/bin/activate; fi; \
+		$(call activate_venv) \
 		pre-commit run --all --hook-stage=commit; \
 	)
 
@@ -33,7 +38,7 @@ verify-prerequisites:
 
 setup: verify-prerequisites venv deps
 	@( \
-		if [ -z $(SKIP_VENV) ]; then source $(VIRTUAL_ENV_PATH)/bin/activate; fi; \
+		$(call activate_venv) \
 		pre-commit install; \
 		echo "DONE: setup"; \
 	)
@@ -42,7 +47,7 @@ setup: verify-prerequisites venv deps
 deps:
 	@( \
 		set -e; \
-		if [ -z $(SKIP_VENV) ]; then source $(VIRTUAL_ENV_PATH)/bin/activate; fi; \
+		$(call activate_venv) \
 		$(POETRY) install --all-extras --no-root; \
 	)
 	
@@ -63,7 +68,7 @@ deps-sync:
 .PHONY: deps-update
 deps-update:
 	@( \
-		if [ -z $(SKIP_VENV) ]; then source $(VIRTUAL_ENV_PATH)/bin/activate; fi; \
+		$(call activate_venv) \
 		$(POETRY) lock; \
 	)
 	
@@ -82,7 +87,7 @@ deps-update-dep:
 .PHONY: deps-tree
 deps-tree:
 	@( \
-		if [ -z $(SKIP_VENV) ]; then source $(VIRTUAL_ENV_PATH)/bin/activate; fi; \
+		$(call activate_venv) \
 		$(POETRY) show --tree; \
 	)
 
@@ -90,14 +95,14 @@ deps-tree:
 venv:
 	@( \
 	  	set -e; \
-		  $(PYTHON) -m venv $(VIRTUAL_ENV_PATH); \
-		  source ./venv/bin/activate; \
+		$(PYTHON) -m venv $(VIRTUAL_ENV_PATH); \
+		source ./venv/bin/activate; \
 	)
 	
 .PHONY: copyright
 copyright:
 	@( \
-       if [ -z $(SKIP_VENV) ]; then source $(VIRTUAL_ENV_PATH)/bin/activate; fi; \
+       $(call activate_venv) \
        echo "Applying copyright..."; \
        for p in $(FORMAT_PATH); do \
        	 licenseheaders -t ./development/copyright.tmpl -E ".py" -cy -d $$p; \
@@ -170,7 +175,7 @@ check-format: ruff-import-sort-check ruff-format-check
 mypy:
 	@( \
        set -e; \
-       if [ -z $(SKIP_VENV) ]; then source $(VIRTUAL_ENV_PATH)/bin/activate; fi; \
+       $(call activate_venv) \
        echo "Running MyPy checks..."; \
        mypy $(MYPY_PATH); \
        echo "DONE: MyPy"; \
@@ -183,8 +188,7 @@ build:
 	@( \
 		echo "Building packages"; \
 		set -e; \
-		if [ -z $(SKIP_VENV) ]; then source $(VIRTUAL_ENV_PATH)/bin/activate; fi; \
-		rm -rf dist/*; \
+		$(call activate_venv) \
 		$(POETRY) build; \
 		echo "DONE: Building packages"; \
 	)
@@ -194,7 +198,7 @@ publish: build
 	@( \
 		echo "Publishing packages"; \
 		set -e; \
-		if [ -z $(SKIP_VENV) ]; then source $(VIRTUAL_ENV_PATH)/bin/activate; fi; \
+		$(call activate_venv) \
 		$(POETRY) publish; \
 		echo "DONE: Publishing packages"; \
 	)
@@ -204,7 +208,7 @@ coverage:
 	@( \
 		echo "Running coverage"; \
 		set -e; \
-		if [ -z $(SKIP_VENV) ]; then source $(VIRTUAL_ENV_PATH)/bin/activate; fi; \
+		$(call activate_venv) \
 		coverage run --source $(SRC_ROOT)/$(ROOT_PACKAGE) -m pytest; \
 		coverage html; \
 		echo "DONE: Coverage"; \
@@ -215,7 +219,7 @@ test:
 	@( \
 		echo "Running tests"; \
 		set -e; \
-		if [ -z $(SKIP_VENV) ]; then source $(VIRTUAL_ENV_PATH)/bin/activate; fi; \
+		$(call activate_venv) \
 		echo pytest -v --cov-report term-missing --cov=$(SRC_ROOT)/$(ROOT_PACKAGE); \
 		pytest -v --html=test-report.html --self-contained-html; \
 		echo "DONE: Tests"; \
@@ -226,7 +230,7 @@ changelog:
 	@( \
 		echo "Generating changelog"; \
 		set -e; \
-		if [ -z $(SKIP_VENV) ]; then source $(VIRTUAL_ENV_PATH)/bin/activate; fi; \
+		$(call activate_venv) \
 		cz changelog --incremental; \
 		echo "DONE: Changelog"; \
 	)
@@ -234,7 +238,7 @@ changelog:
 .PHONY: print-changelog
 print-changelog:
 	@( \
-		if [ -z $(SKIP_VENV) ]; then source $(VIRTUAL_ENV_PATH)/bin/activate; fi; \
+		$(call activate_venv) \
 		cz changelog --dry-run --incremental; \
 	)
 
@@ -243,7 +247,7 @@ release:
 	@( \
 		echo "Preparing release"; \
 		set -e; \
-		if [ -z $(SKIP_VENV) ]; then source $(VIRTUAL_ENV_PATH)/bin/activate; fi; \
+		$(call activate_venv) \
 		cz bump --changelog; \
 		echo "DONE: Preparing release"; \
 	)
@@ -251,7 +255,7 @@ release:
 .PHONY: print-version
 print-version:
 	@( \
-		if [ -z $(SKIP_VENV) ]; then source $(VIRTUAL_ENV_PATH)/bin/activate; fi; \
+		$(call activate_venv) \
 		cz version --project; \
 	)
 
