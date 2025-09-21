@@ -90,9 +90,9 @@ disallow_any_generics = false
 warn_unused_ignores = true
 pretty = true
 strict = true
-mypy_path = "$MYPY_CONFIG_FILE_DIR/stubs"
+mypy_path = "$MYPY_CONFIG_FILE_DIR/stubs:src"
 exclude = ["test_.*\\.py$", "test\\.py$"]
-plugins = []
+plugins = ["mypy_django_plugin.main"]
 
 [[tool.mypy.overrides]]
 # External libs which doesn't have type hints (py.typed marker)
@@ -101,7 +101,7 @@ ignore_missing_imports = true
 follow_imports = "skip"
 
 [tool.django-stubs]
-django_settings_module = "example_project.settings.dev"
+django_settings_module = "example_project.settings"
 
 [tool.ruff]
 line-length = 120

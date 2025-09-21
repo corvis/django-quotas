@@ -31,10 +31,10 @@ class DbQuotaService(QuotaService):
         current_time = datetime_now().replace(minute=0, second=0, microsecond=0)
 
         with transaction.atomic():
-            usage, _ = cfg_db.quota_usage_cls.objects.get_or_create(
+            usage, _ = cfg_db.quota_usage_cls.objects.get_or_create(  # type: ignore[attr-defined]
                 account_id=account_id, feature_name=feature_name, point_in_time=current_time
             )
-            cfg_db.quota_usage_cls.objects.filter(id=usage.id, point_in_time=current_time).update(
+            cfg_db.quota_usage_cls.objects.filter(id=usage.id, point_in_time=current_time).update(  # type: ignore[attr-defined]
                 usage_count=F("usage_count") + increment
             )
 
@@ -63,7 +63,7 @@ class DbQuotaService(QuotaService):
         current_hour = self.__get_current_hour()  # Current hour
         today = current_hour.replace(hour=0, minute=0, second=0, microsecond=0)  # Current day
         first__day_of_month = today.replace(day=1)
-        quotas_qs = cfg.quota_cls.objects.filter(account_id=account_id)
+        quotas_qs = cfg.quota_cls.objects.filter(account_id=account_id)  # type: ignore[attr-defined]
         if feature_name:
             quotas_qs = quotas_qs.filter(feature_name__in=feature_name)
 
@@ -107,7 +107,7 @@ class DbQuotaService(QuotaService):
     def set_quota(
         self, account_id: uuid.UUID, feature_name: str, limits: ValuePerBucket, owner_tag: str | None = None
     ) -> Quota:
-        quota_model, _ = cfg.quota_cls.objects.update_or_create(
+        quota_model, _ = cfg.quota_cls.objects.update_or_create(  # type: ignore[attr-defined]
             account_id=account_id,
             feature_name=feature_name,
             defaults={
@@ -138,7 +138,7 @@ class DbQuotaService(QuotaService):
 
         Returns a dict with feature names as keys and usage as values.
         """
-        qs = QuotaUsageModel.objects.filter(account_id=account_id, feature_name__in=feature_name, **extra_query_args)
+        qs = QuotaUsageModel.objects.filter(account_id=account_id, feature_name__in=feature_name, **extra_query_args)  # type: ignore[attr-defined]
         if feature_name is not None:
             qs = qs.filter(feature_name__in=feature_name)
         qs = qs.values("feature_name").annotate(total_usage=Sum("usage_count"))

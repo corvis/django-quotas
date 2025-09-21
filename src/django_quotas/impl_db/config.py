@@ -26,9 +26,7 @@ class __DjangoQuotasDbConfig:
 
         @return: Model name string.
         """
-        return getattr(
-            settings, f"{self.SETTINGS_PREFIX}_IMPL_DB_USAGE_MODEL_NAME", "django_quotas_db.QuotaUsageModel"
-        )
+        return getattr(settings, f"{self.SETTINGS_PREFIX}_IMPL_DB_USAGE_MODEL_NAME", "django_quotas_db.QuotaUsageModel")
 
     @cached_property
     def quota_usage_cls(self) -> type["QuotaUsageModel"]:

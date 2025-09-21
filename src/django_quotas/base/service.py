@@ -21,6 +21,7 @@ class QuotaExceededError(Exception):
     :param account_name: The account UUID.
     :param exceeded_features: Mapping of feature names to exceeded bucket stats.
     """
+
     def __init__(self, account_name: uuid.UUID, exceeded_features: dict[str, list[QuotaUseForBucket]]):
         self.account_id = account_name
         self._exceeded_features_stats = exceeded_features
@@ -40,7 +41,7 @@ class QuotaExceededError(Exception):
         """
         return self._exceeded_features_stats
 
-    def __generate_detailed_message(self):
+    def __generate_detailed_message(self) -> str:
         msg = self.__generate_msg() + "\nDetails:"
         for feature, stats in self._exceeded_features_stats.items():
             msg += f"\n{feature}: "
@@ -50,12 +51,13 @@ class QuotaExceededError(Exception):
             msg += ", ".join(buckets)
         return msg
 
-    def __generate_msg(self):
+    def __generate_msg(self) -> str:
         return f"Quota exceeded for account {self.account_id}. Exceeded features: {self.get_exceeded_features()}"
 
 
 class QuotaService(metaclass=abc.ABCMeta):
     """Abstract base class for quota service implementations."""
+
     def ensure_quota_or_raise(
         self, account_id: uuid.UUID, feature_name: str | set[str], potential_increase: int = 1
     ) -> None:
@@ -65,7 +67,8 @@ class QuotaService(metaclass=abc.ABCMeta):
         If the quota is exceeded, raise a QuotaExceededError.
         :param account_id: The account ID.
         :param feature_name: The feature name or set of feature names.
-        :param potential_increase: The potential increase in usage. Current utilization + potential increase must be less than the quota.
+        :param potential_increase: The potential increase in usage.\
+            Current utilization + potential increase must be less than the quota.
         :raise QuotaExceededError: If the quota is exceeded.
         """
         feature_names: set[str] = {feature_name} if isinstance(feature_name, str) else feature_name
@@ -104,7 +107,8 @@ class QuotaService(metaclass=abc.ABCMeta):
         If the quota is exceeded, raise a QuotaExceededError.
         :param account_id: The account ID.
         :param feature_name: The feature name.
-        :param potential_increase: The potential increase in usage. Current utilization + potential increase must be less than the quota.
+        :param potential_increase: The potential increase in usage.\
+            Current utilization + potential_increase must be less than the quota.
         """
         return await sync_to_async(self.ensure_quota_or_raise)(account_id, feature_name, potential_increase)
 

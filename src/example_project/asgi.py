@@ -1,3 +1,6 @@
+#
+#  Copyright 2025 by Dmitry Berezovsky, MIT License
+#
 """
 ASGI config for example_project project.
 
@@ -11,6 +14,6 @@ import os
 
 from django.core.asgi import get_asgi_application
 
-os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'example_project.settings')
+os.environ.setdefault("DJANGO_SETTINGS_MODULE", "example_project.settings")
 
 application = get_asgi_application()

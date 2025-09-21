@@ -19,9 +19,10 @@ def get_model_by_name(model_name: str) -> type[models.Model]:
     :raises ValueError: If the model cannot be found.
     """
     try:
-        return cast(type[models.Model], apps.get_model(*model_name.split(".", 1)))
-    except LookupError:
-        raise ValueError(f"Model {model_name} not found")
+        app_label, model = model_name.split(".", 1)
+        return cast(type[models.Model], apps.get_model(app_label, model))
+    except LookupError as err:
+        raise ValueError(f"Model {model_name} not found") from err
 
 
 def get_class_by_name(dotted_path: str) -> type:

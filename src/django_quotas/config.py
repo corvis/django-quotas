@@ -67,7 +67,7 @@ class __DjangoQuotasConfig:
 
         :return: Related account model class.
         """
-        return get_model_by_name(self.QUOTA_RELATED_ACCOUNT_MODEL)  # type: ignore
+        return get_model_by_name(self.QUOTA_RELATED_ACCOUNT_MODEL)
 
 
 DjangoQuotasConfig = __DjangoQuotasConfig()

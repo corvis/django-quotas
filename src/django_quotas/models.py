@@ -2,6 +2,7 @@
 #  Copyright 2025 by Dmitry Berezovsky, MIT License
 #
 import abc
+from typing import cast
 import uuid
 
 from django.db import models
@@ -36,23 +37,24 @@ class BaseQuotaModel(models.Model):
             hourly=self.hourly_limit, daily=self.daily_limit, monthly=self.monthly_limit, total=self.total_limit
         )
 
-
-class _QuotaModelMetaclass(type(models.Model), abc.ABCMeta, type(Quota)):  # type:ignore[misc]
-    """Specific metaclass to satisfy django migrations creating class in a non-standard way."""
-
-    pass
-
-
-class DefaultQuotaModel(BaseQuotaModel, Quota, metaclass=_QuotaModelMetaclass):
-    """Model for actual quota assigned to a user."""
-
     @property
+    @abc.abstractmethod
     def id(self) -> uuid.UUID:
         """Return the unique identifier for the quota instance.
 
         :return: UUID of the quota instance.
         """
-        return self.pk
+        ...
+
+
+class _QuotaModelMetaclass(type(models.Model), abc.ABCMeta, type(Quota)):  # type: ignore[misc]
+    """Specific metaclass to satisfy django migrations creating class in a non-standard way."""
+
+    pass
+
+
+class DefaultQuotaModel(BaseQuotaModel, Quota, metaclass=_QuotaModelMetaclass):  # type: ignore[metaclass]
+    """Model for actual quota assigned to a user."""
 
     class Meta:
         abstract = True
@@ -61,7 +63,7 @@ class DefaultQuotaModel(BaseQuotaModel, Quota, metaclass=_QuotaModelMetaclass):
         unique_together = ("account", "feature_name")
         indexes = (models.Index(fields=["account", "feature_name"]),)
 
-    account = models.ForeignKey(
+    account: models.Model = models.ForeignKey(  # type: ignore[assignment]
         cfg.QUOTA_RELATED_ACCOUNT_MODEL,
         null=False,
         blank=False,
@@ -71,9 +73,17 @@ class DefaultQuotaModel(BaseQuotaModel, Quota, metaclass=_QuotaModelMetaclass):
     )
 
     @property
+    def id(self) -> uuid.UUID:
+        """Return the unique identifier for the quota instance.
+
+        :return: UUID of the quota instance.
+        """
+        return self.pk
+
+    @property
     def account_id(self) -> uuid.UUID:
         """Return the unique identifier for the associated account.
 
         :return: Account UUID.
         """
-        return self.account.id
+        return cast(uuid.UUID, self.account.pk)

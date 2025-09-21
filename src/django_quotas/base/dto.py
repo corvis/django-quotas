@@ -1,11 +1,11 @@
 #
 #  Copyright 2025 by Dmitry Berezovsky, MIT License
 #
+import abc
 import dataclasses
 import datetime
-import uuid
-import abc
 from enum import StrEnum
+import uuid
 
 __all__ = [
     "QuotaBucket",
@@ -20,6 +20,7 @@ __all__ = [
 
 class QuotaBucket(StrEnum):
     """Enumeration of supported quota buckets."""
+
     HOURLY = "hourly"
     DAILY = "daily"
     MONTHLY = "monthly"
@@ -35,6 +36,7 @@ class ValuePerBucket:
     :param monthly: Monthly quota value.
     :param total: Total quota value.
     """
+
     hourly: int | None = None
     daily: int | None = None
     monthly: int | None = None
@@ -49,6 +51,7 @@ class QuotaStatus:
     :param limits: Quota limits per bucket.
     :param usage: Current usage per bucket.
     """
+
     quota_id: uuid.UUID
     limits: ValuePerBucket
     usage: ValuePerBucket
@@ -78,6 +81,7 @@ class QuotaStats:
     :param account_id: Account identifier.
     :param feature_stats: Mapping of feature names to their quota status.
     """
+
     account_id: uuid.UUID
     feature_stats: dict[str, QuotaStatus]
 
@@ -98,6 +102,7 @@ class QuotaUseForBucket:
     :param limit: Limit for the bucket.
     :param quota_id: Associated quota identifier.
     """
+
     bucket_name: QuotaBucket
     current_usage: int
     limit: int | None
@@ -116,6 +121,7 @@ class QuotaUseForBucket:
 
 class Quota(metaclass=abc.ABCMeta):
     """Abstract base class for quota definitions."""
+
     @property
     @abc.abstractmethod
     def id(self) -> uuid.UUID:
@@ -155,6 +161,7 @@ class Quota(metaclass=abc.ABCMeta):
 
 class QuotaUsage(metaclass=abc.ABCMeta):
     """Abstract base class for quota usage records."""
+
     @property
     @abc.abstractmethod
     def account_id(self) -> uuid.UUID:
