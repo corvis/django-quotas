@@ -1,3 +1,10 @@
+"""Database-backed implementation subpackage for django_quotas.
+
+@package django_quotas.impl_db
+"""
+
+__all__ = []
+
 #
 #  Copyright 2025 by Dmitry Berezovsky, MIT License
 #

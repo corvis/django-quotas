@@ -10,7 +10,7 @@ from django_quotas.config import DjangoQuotasConfig as cfg
 
 
 class QuotaUsageModel(models.Model):
-    """Model for tracking quota usage"""
+    """Model for tracking quota usage per account, feature, and time point."""
 
     class Meta:
         db_table = f'"{cfg.TABLE_SCHEMA}"."{cfg.TABLE_PREFIX}_quota_usage"'
@@ -29,4 +29,8 @@ class QuotaUsageModel(models.Model):
 
     @property
     def account_id(self) -> uuid.UUID:
+        """Return the unique identifier for the associated account.
+
+        :return: Account UUID.
+        """
         return self.account.pk

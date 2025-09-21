@@ -12,15 +12,30 @@ if TYPE_CHECKING:
     from django_quotas.impl_db.models import QuotaUsageModel
 
 
+__all__ = ["__DjangoQuotasDbConfig", "DjangoQuotasDbConfig"]
+
+
 class __DjangoQuotasDbConfig:
+    """Configuration accessor for DB-backed quotas implementation."""
+
     SETTINGS_PREFIX: Final[str] = "DJANGO_QUOTAS"
 
     @cached_property
     def QUOTA_USAGE_MODEL(self) -> str:
-        return getattr(settings, f"{self.SETTINGS_PREFIX}_IMPL_DB_USAGE_MODEL_NAME", "django_quotas_db.QuotaUsageModel")
+        """Return the full model name for the quota usage model.
+
+        @return: Model name string.
+        """
+        return getattr(
+            settings, f"{self.SETTINGS_PREFIX}_IMPL_DB_USAGE_MODEL_NAME", "django_quotas_db.QuotaUsageModel"
+        )
 
     @cached_property
     def quota_usage_cls(self) -> type["QuotaUsageModel"]:
+        """Return the quota usage model class.
+
+        @return: Quota usage model class.
+        """
         return get_model_by_name(self.QUOTA_USAGE_MODEL)  # type: ignore
 
 

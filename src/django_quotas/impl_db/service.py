@@ -21,6 +21,12 @@ from django_quotas.utils import datetime_now
 
 class DbQuotaService(QuotaService):
     def register_usage(self, account_id: uuid.UUID, feature_name: str, increment: int = 1) -> None:
+        """Register usage for the given account and feature.
+
+        :param account_id: The account ID.
+        :param feature_name: The feature name.
+        :param increment: The value to be added to quota usage.
+        """
         # Current hour
         current_time = datetime_now().replace(minute=0, second=0, microsecond=0)
 
@@ -33,6 +39,12 @@ class DbQuotaService(QuotaService):
             )
 
     async def aregister_usage(self, account_id: uuid.UUID, feature_name: str | set[str], increment: int = 1) -> None:
+        """Asynchronously register usage for the given account and feature(s).
+
+        :param account_id: The account ID.
+        :param feature_name: The feature name or set of feature names.
+        :param increment: The value to be added to quota usage.
+        """
         if isinstance(feature_name, str):
             feature_names = {feature_name}
         else:
@@ -40,6 +52,12 @@ class DbQuotaService(QuotaService):
         await asyncio.gather(*[sync_to_async(self.register_usage)(account_id, f, increment) for f in feature_names])
 
     def get_quotas_utilization(self, account_id: uuid.UUID, feature_name: str | set[str] | None) -> QuotaStats:
+        """Get the quota utilization for the given account and features.
+
+        :param account_id: The account ID.
+        :param feature_name: Name of the feature or a set of feature names. None means all features having quotas.
+        :return: QuotaStats instance with utilization data.
+        """
         if feature_name and isinstance(feature_name, str):
             feature_name = {feature_name}
         current_hour = self.__get_current_hour()  # Current hour

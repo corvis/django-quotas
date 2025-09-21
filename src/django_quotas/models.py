@@ -10,9 +10,11 @@ from django.utils.translation import gettext_lazy as gt
 from django_quotas.base.dto import Quota, ValuePerBucket
 from django_quotas.config import DjangoQuotasConfig as cfg
 
+__all__ = ["BaseQuotaModel", "DefaultQuotaModel"]
+
 
 class BaseQuotaModel(models.Model):
-    """Base model for quotas that can be converted to Quota interface when needed"""
+    """Base model for quotas that can be converted to Quota interface when needed."""
 
     class Meta:
         abstract = True
@@ -26,6 +28,10 @@ class BaseQuotaModel(models.Model):
 
     @property
     def get_limits(self) -> ValuePerBucket:
+        """Return the quota limits as a ValuePerBucket instance.
+
+        :return: ValuePerBucket with limits for each bucket.
+        """
         return ValuePerBucket(
             hourly=self.hourly_limit, daily=self.daily_limit, monthly=self.monthly_limit, total=self.total_limit
         )
@@ -42,6 +48,10 @@ class DefaultQuotaModel(BaseQuotaModel, Quota, metaclass=_QuotaModelMetaclass):
 
     @property
     def id(self) -> uuid.UUID:
+        """Return the unique identifier for the quota instance.
+
+        :return: UUID of the quota instance.
+        """
         return self.pk
 
     class Meta:
@@ -62,4 +72,8 @@ class DefaultQuotaModel(BaseQuotaModel, Quota, metaclass=_QuotaModelMetaclass):
 
     @property
     def account_id(self) -> uuid.UUID:
+        """Return the unique identifier for the associated account.
+
+        :return: Account UUID.
+        """
         return self.account.id
