@@ -5,6 +5,7 @@ PYTHON := python3.12
 SRC_ROOT := ./src
 ROOT_PACKAGE := django_quotas
 .DEFAULT_GOAL := pre_commit
+POETRY_GROUPS := dev
 POETRY := poetry@2
 
 FORMAT_PATH := $(SRC_ROOT)

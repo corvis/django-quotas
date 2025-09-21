@@ -27,12 +27,13 @@ repository = "https://github.com/corvis/django-quotas"
 [tool.poetry]
 packages = [{ include = "django_quotas", from = "src" }]
 exclude = ["src/django_quotas/**/test_*", "src/django_quotas/**/tests"]
+requires-poetry = '>=2.0,<3.0'
 
 [build-system]
 requires = ["poetry-core>=1.0.0"]
 build-backend = "poetry.core.masonry.api"
 
-[dependency-groups.dev]
+[tool.poetry.group.dev.dependencies]
 # Unit tests
 coverage = { version = "=6.5", extras = ["toml"] }
 pytest = "~=7.2"
