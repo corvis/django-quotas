@@ -1,6 +1,15 @@
 # Django Quotas
 
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
+<p align="center">
+  <a href="https://pypi.org/project/django-quotas/"><img src="https://img.shields.io/pypi/l/django-quotas?style=for-the-badge" title="License: MIT"/></a> 
+  <a href="https://pypi.org/project/django-quotas/"><img src="https://img.shields.io/pypi/pyversions/django-quotas?style=for-the-badge" title="Python Versions"/></a> 
+  <a href="https://github.com/psf/django-quotas/"><img src="https://img.shields.io/badge/Code%20Style-black-black?style=for-the-badge" title="Code style: black"/></a> 
+  <a href="https://pypi.org/project/django-quotas/"><img src="https://img.shields.io/pypi/v/django-quotas?style=for-the-badge" title="PyPy Version"/></a> 
+  <a href="https://pypi.org/project/django-quotas/"><img src="https://img.shields.io/pypi/dm/django-quotas?style=for-the-badge" title="PyPy Downloads"/></a> 
+  <br>
+  <a href="https://github.com/corvis/django-quotas/"><img src="https://img.shields.io/github/last-commit/corvis/django-quotas?style=for-the-badge" title="Last Commit"/></a> 
+  <a href="https://github.com/corvis/django-quotas/releases/"><img src="https://img.shields.io/github/release-date/corvis/django-quotas?style=for-the-badge" title="Last Release"/></a> 
+</p>
 
 A robust, extensible quotas and plan management library for Django applications. This package provides a flexible
 framework for defining, assigning, and tracking quotas (limits) for users, accounts, or any custom entity in your Django
