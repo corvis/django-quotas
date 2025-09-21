@@ -3,7 +3,7 @@
 #
 import asyncio
 import datetime
-from typing import Any
+from typing import Any, cast
 import uuid
 
 from asgiref.sync import sync_to_async
@@ -31,10 +31,10 @@ class DbQuotaService(QuotaService):
         current_time = datetime_now().replace(minute=0, second=0, microsecond=0)
 
         with transaction.atomic():
-            usage, _ = cfg_db.quota_usage_cls.objects.get_or_create(  # type: ignore[attr-defined]
+            usage, _ = cfg_db.quota_usage_cls.objects.get_or_create(
                 account_id=account_id, feature_name=feature_name, point_in_time=current_time
             )
-            cfg_db.quota_usage_cls.objects.filter(id=usage.id, point_in_time=current_time).update(  # type: ignore[attr-defined]
+            cfg_db.quota_usage_cls.objects.filter(id=usage.id, point_in_time=current_time).update(
                 usage_count=F("usage_count") + increment
             )
 
@@ -105,7 +105,7 @@ class DbQuotaService(QuotaService):
         return await sync_to_async(self.get_quotas_utilization)(account_id, feature_name)
 
     def set_quota(
-        self, account_id: uuid.UUID, feature_name: str, limits: ValuePerBucket, owner_tag: str | None = None
+        self, account_id: uuid.UUID | int, feature_name: str, limits: ValuePerBucket, owner_tag: str | None = None
     ) -> Quota:
         quota_model, _ = cfg.quota_cls.objects.update_or_create(  # type: ignore[attr-defined]
             account_id=account_id,
@@ -138,8 +138,10 @@ class DbQuotaService(QuotaService):
 
         Returns a dict with feature names as keys and usage as values.
         """
-        qs = QuotaUsageModel.objects.filter(account_id=account_id, feature_name__in=feature_name, **extra_query_args)  # type: ignore[attr-defined]
+        qs = QuotaUsageModel.objects.filter(
+            account_id=cast(Any, account_id), feature_name__in=feature_name, **extra_query_args
+        )
         if feature_name is not None:
             qs = qs.filter(feature_name__in=feature_name)
-        qs = qs.values("feature_name").annotate(total_usage=Sum("usage_count"))
-        return {item["feature_name"]: item["total_usage"] for item in qs}
+        qs_annotated = qs.values("feature_name").annotate(total_usage=Sum("usage_count"))
+        return {item["feature_name"]: item["total_usage"] for item in qs_annotated}

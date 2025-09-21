@@ -2,18 +2,20 @@
 #  Copyright 2025 by Dmitry Berezovsky, MIT License
 #
 from functools import cached_property
-from typing import TYPE_CHECKING, Final
+from typing import TYPE_CHECKING, Final, cast
 
 from django.conf import settings
 from django.db import models
 
-from django_quotas.utils import get_model_by_name
+from django_quotas.utils import get_class_by_name, get_model_by_name
 
 if TYPE_CHECKING:
+    from django.contrib.admin import ModelAdmin
+
     from django_quotas.models import BaseQuotaModel
 
 
-__all__ = ["__DjangoQuotasConfig"]
+__all__ = ["DjangoQuotasConfig"]
 
 
 class __DjangoQuotasConfig:
@@ -30,20 +32,12 @@ class __DjangoQuotasConfig:
         return getattr(settings, f"{self.SETTINGS_PREFIX}_TABLE_PREFIX", "django_quotas")
 
     @cached_property
-    def TABLE_SCHEMA(self) -> str:
-        """Return the schema name for quota tables.
-
-        :return: Schema name string.
-        """
-        return getattr(settings, f"{self.SETTINGS_PREFIX}_TABLE_SCHEMA", "public")
-
-    @cached_property
     def QUOTA_MODEL(self) -> str:
         """Get the full model name for the quota model.
 
         :return: Model name string.
         """
-        return getattr(settings, f"{self.SETTINGS_PREFIX}_QUOTA_MODEL_NAME", "django_quotas.QuotaModel")
+        return getattr(settings, f"{self.SETTINGS_PREFIX}_QUOTA_MODEL_NAME", "django_quotas.defaults.QuotaModel")
 
     @cached_property
     def QUOTA_RELATED_ACCOUNT_MODEL(self) -> str:
@@ -54,7 +48,15 @@ class __DjangoQuotasConfig:
         return getattr(settings, f"{self.SETTINGS_PREFIX}_QUOTA_RELATED_ACCOUNT_MODEL_NAME", "auth.User")
 
     @cached_property
-    def quota_cls(self) -> type[BaseQuotaModel]:
+    def BASE_ADMIN_CLASS(self) -> str:
+        """Get the base admin class for quota admin interfaces.
+
+        :return: Base admin class name string
+        """
+        return getattr(settings, f"{self.SETTINGS_PREFIX}_BASE_ADMIN_CLASS", "django.contrib.admin.ModelAdmin")
+
+    @cached_property
+    def quota_cls(self) -> type["BaseQuotaModel"]:
         """Get the quota model class.
 
         :return: Quota model class.
@@ -68,6 +70,13 @@ class __DjangoQuotasConfig:
         :return: Related account model class.
         """
         return get_model_by_name(self.QUOTA_RELATED_ACCOUNT_MODEL)
+
+    def base_admin_cls(self) -> type["ModelAdmin"]:
+        """Get the base admin class for quota admin interfaces.
+
+        :return: Base admin class.
+        """
+        return cast(type["ModelAdmin"], get_class_by_name(self.BASE_ADMIN_CLASS))
 
 
 DjangoQuotasConfig = __DjangoQuotasConfig()

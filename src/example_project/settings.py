@@ -30,6 +30,7 @@ DEBUG = True
 
 ALLOWED_HOSTS: list[str] = []
 
+AUTH_USER_MODEL = "auth.User"
 
 # Application definition
 
@@ -40,6 +41,10 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
+    # QUOTAS
+    "django_quotas",
+    "django_quotas.defaults",  # Use default quota model
+    "django_quotas.impl_db",  # Use DB-based quota service implementation
 ]
 
 MIDDLEWARE = [
@@ -123,3 +128,8 @@ STATIC_URL = "static/"
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
+
+# QUOTAS CONFIGURATION
+# --------------------
+DJANGO_QUOTAS_QUOTA_SERVICE = "django_quotas.impl_db.DbQuotaService"
+DJANGO_QUOTAS_QUOTA_RELATED_ACCOUNT_MODEL_NAME = AUTH_USER_MODEL
