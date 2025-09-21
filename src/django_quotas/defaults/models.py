@@ -32,11 +32,3 @@ class DefaultQuotaModel(BaseQuotaModel, Quota, metaclass=QuotaModelMetaclass):
         db_index=True,
         swappable=True,
     )
-
-    @property
-    def account_id(self) -> uuid.UUID:  # type: ignore[no-untyped-def]
-        """Return the unique identifier for the associated account.
-
-        :return: Account UUID.
-        """
-        return cast(uuid.UUID, self.account.pk)

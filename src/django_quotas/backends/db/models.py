@@ -28,11 +28,3 @@ class QuotaUsageModel(models.Model):
     feature_name = models.CharField(max_length=300, null=False, blank=False)
     point_in_time = models.DateTimeField(null=False, blank=False)
     usage_count = models.IntegerField(null=False, blank=False, default=0)
-
-    @property
-    def account_id(self) -> uuid.UUID:  # type: ignore[no-untyped-def]
-        """Return the unique identifier for the associated account.
-
-        :return: Account UUID.
-        """
-        return self.account.pk
