@@ -41,7 +41,12 @@
     - Use logging instead of print statements. Prefer adding LogMixin to class and use `self.log.info(....)`.
     - When makes sense add additional context to log messages (e.g. user id, object id) using `extra={}` parameter.
     - Avoid f-strings for log messages; use lazy formatting with `%s` placeholders.
-
+- Unit Tests:
+  - Use `unittest` for unit tests. Always prefer class based approach.
+  - Use `self.assertEqual`, `self.assertTrue`, etc. instead of bare `assert` statements.
+  - Use `unittest.mock` for mocking dependencies.
+  - Use subtests when testing multiple similar cases, define inputs as constants.
+  - Use type hints for test methods and variables.
 - Use `pathlib.Path` for filesystem paths instead of string paths.
 - General style: follow PEP8 as enforced by ruff and flake8.
 - When possible generate unit tests when adding new functionality or fixing bugs.
