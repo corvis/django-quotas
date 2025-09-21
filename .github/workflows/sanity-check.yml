@@ -31,4 +31,4 @@ jobs:
         run: make lint
 
       - name: Run build to make sure it works
-        run: make build
+        run: make build POETRY=poetry
