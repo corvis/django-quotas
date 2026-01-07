@@ -9,12 +9,11 @@ import uuid
 from django.db import models
 from django.utils.translation import gettext_lazy as gt
 
-from django_quotas.base.dto import Quota
 from django_quotas.config import DjangoQuotasConfig as cfg
 from django_quotas.models import BaseQuotaModel, QuotaModelMetaclass
 
 
-class DefaultQuotaModel(BaseQuotaModel, Quota, metaclass=QuotaModelMetaclass):
+class DefaultQuotaModel(BaseQuotaModel, metaclass=QuotaModelMetaclass):
     """Model for actual quota assigned to a user."""
 
     class Meta:
@@ -32,3 +31,6 @@ class DefaultQuotaModel(BaseQuotaModel, Quota, metaclass=QuotaModelMetaclass):
         db_index=True,
         swappable=True,
     )
+
+    def __str__(self) -> str:
+        return f"Quota(id={self.pk}, feature={self.feature_name})"

@@ -14,6 +14,8 @@ __all__ = [
     "QuotaService",
 ]
 
+from django_quotas.base.features import FeatureId
+
 
 class QuotaExceededError(Exception):
     """Exception raised when a quota is exceeded for an account and feature(s).
@@ -22,7 +24,7 @@ class QuotaExceededError(Exception):
     :param exceeded_features: Mapping of feature names to exceeded bucket stats.
     """
 
-    def __init__(self, account_name: uuid.UUID, exceeded_features: dict[str, list[QuotaUseForBucket]]):
+    def __init__(self, account_name: str, exceeded_features: dict[str, list[QuotaUseForBucket]]):
         self.account_id = account_name
         self._exceeded_features_stats = exceeded_features
         super().__init__(self.__generate_detailed_message())
@@ -59,20 +61,20 @@ class QuotaService(metaclass=abc.ABCMeta):
     """Abstract base class for quota service implementations."""
 
     def ensure_quota_or_raise(
-        self, account_id: uuid.UUID, feature_name: str | set[str], potential_increase: int = 1
+        self, account_id: str, feature: FeatureId | set[FeatureId], potential_increase: int = 1
     ) -> None:
         """
         Ensure that the quota for the given account and feature is not exceeded.
 
         If the quota is exceeded, raise a QuotaExceededError.
         :param account_id: The account ID.
-        :param feature_name: The feature name or set of feature names.
+        :param feature: The feature name or set of feature names.
         :param potential_increase: The potential increase in usage.\
             Current utilization + potential increase must be less than the quota.
         :raise QuotaExceededError: If the quota is exceeded.
         """
-        feature_names: set[str] = {feature_name} if isinstance(feature_name, str) else feature_name
-        utilization = self.get_quotas_utilization(account_id, feature_name)
+        feature_names: set[str] = self.resolve_feature_names(feature)
+        utilization = self.get_quotas_utilization(account_id, feature)
         exceeded_features: dict[str, list[QuotaUseForBucket]] = defaultdict(list)
         for feature in feature_names:
             if feature not in utilization.feature_stats:
@@ -99,70 +101,83 @@ class QuotaService(metaclass=abc.ABCMeta):
             raise QuotaExceededError(account_id, exceeded_features)
 
     async def aensure_quota_or_raise(
-        self, account_id: uuid.UUID, feature_name: str | set[str], potential_increase: int = 1
+        self, account_id: str, feature: FeatureId | set[FeatureId], potential_increase: int = 1
     ) -> None:
         """
         Ensure that the quota for the given account and feature is not exceeded.
 
         If the quota is exceeded, raise a QuotaExceededError.
         :param account_id: The account ID.
-        :param feature_name: The feature name.
+        :param feature: The feature name.
         :param potential_increase: The potential increase in usage.\
             Current utilization + potential_increase must be less than the quota.
         """
-        return await sync_to_async(self.ensure_quota_or_raise)(account_id, feature_name, potential_increase)
+        return await sync_to_async(self.ensure_quota_or_raise)(account_id, feature, potential_increase)
 
     @abc.abstractmethod
-    def register_usage(self, account_id: uuid.UUID, feature_name: str, increment: int = 1) -> None:
+    def register_usage(self, account_id: str, feature: FeatureId, increment: int = 1) -> None:
         """
         Register usage for the given account and feature.
 
         :param account_id: The account ID.
-        :param feature_name: The feature name.
+        :param feature: The feature name.
         :param increment: The value to be added to quota usage.
         """
         pass
 
     @abc.abstractmethod
-    async def aregister_usage(self, account_id: uuid.UUID, feature_name: str | set[str], increment: int = 1) -> None:
+    async def aregister_usage(self, account_id: str, feature: FeatureId | set[FeatureId], increment: int = 1) -> None:
         """
         Register usage for the given account and feature.
 
         :param account_id: The account ID.
-        :param feature_name: The feature name.
+        :param feature: The feature name.
         :param increment: The value to be added to quota usage.
         """
         pass
 
     @abc.abstractmethod
-    def get_quotas_utilization(self, account_id: uuid.UUID, feature_name: str | set[str] | None) -> QuotaStats:
+    def get_quotas_utilization(self, account_id: str, feature: FeatureId | set[FeatureId] | None) -> QuotaStats:
         """
         Get the quota utilization for the given account and features.
 
         :param account_id: The account ID.
-        :param feature_name: Name of the feature or a list of feature names. None means all features having quotas.
+        :param feature: Name of the feature or a list of feature names. None means all features having quotas.
         """
         pass
 
+    def _get_account_id_for_quota_search(self, account_id: str) -> str:
+        """
+        Get the account ID to be used for quota search.
+        This method can be overridden in subclasses to modify the account ID e.g. if for anonymous users account ID
+        is generated dynamically e.g. based on IP address or session ID you most likely want to setup quota for ANY
+        anonymous user rather than for each unique anonymous user. So this is the right place to transform account ID
+        into a common one for all anonymous users.
+
+        :param account_id: The account ID.
+        :return: The account ID to be used for quota search.
+        """
+        return account_id
+
     @abc.abstractmethod
-    async def aget_quotas_utilization(self, account_id: uuid.UUID, feature_name: str | set[str] | None) -> QuotaStats:
+    async def aget_quotas_utilization(self, account_id: str, feature: FeatureId | set[FeatureId] | None) -> QuotaStats:
         """
         Get the quota utilization for the given account and features.
 
         :param account_id: The account ID.
-        :param feature_name: Name of the feature or a list of feature names. None means all features having quotas.
+        :param feature: Name of the feature or a list of feature names. None means all features having quotas.
         """
         pass
 
     @abc.abstractmethod
     def set_quota(
-        self, account_id: uuid.UUID, feature_name: str, limits: ValuePerBucket, owner_tag: str | None = None
+        self, account_id: str, feature: FeatureId, limits: ValuePerBucket, owner_tag: str | None = None
     ) -> Quota:
         """
         Set the quota for the given account and feature.
 
         :param account_id: The account ID.
-        :param feature_name: The feature name.
+        :param feature: The feature name.
         :param limits: Limits for each bucket.
         :param owner_tag: Optional owner tag.
         :return: The created or updated quota.
@@ -171,15 +186,39 @@ class QuotaService(metaclass=abc.ABCMeta):
 
     @abc.abstractmethod
     async def aset_quota(
-        self, account_id: uuid.UUID, feature_name: str, limits: ValuePerBucket, owner_tag: str | None = None
+        self, account_id: str, feature: FeatureId, limits: ValuePerBucket, owner_tag: str | None = None
     ) -> Quota:
         """
         Set the quota for the given account and feature.
 
         :param account_id: The account ID.
-        :param feature_name: The feature name.
+        :param feature: The feature name.
         :param limits: Limits for each bucket.
         :param owner_tag: Optional owner tag.
         :return: The created or updated quota.
         """
         pass
+
+    @staticmethod
+    def resolve_feature_names(features: FeatureId | set[FeatureId]) -> set[str]:
+        """
+        Resolve feature names from FeatureId or set of FeatureId.
+
+        :param features: FeatureId or set of FeatureId.
+        :return: Set of feature names.
+        """
+        if isinstance(features, set):
+            return {QuotaService.resolve_feature_name(f) for f in features}
+        return {QuotaService.resolve_feature_name(features)}
+
+    @staticmethod
+    def resolve_feature_name(feature: FeatureId) -> str:
+        """
+        Resolve feature name from FeatureId.
+
+        :param feature: FeatureId.
+        :return: Feature name.
+        """
+        if isinstance(feature, str):
+            return feature
+        return feature.full_name

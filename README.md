@@ -56,7 +56,7 @@ poetry add django-quotas
    ```python
    DJANGO_QUOTAS_TABLE_PREFIX = 'myquotas'  # default: 'django_quotas'
    DJANGO_QUOTAS_QUOTA_MODEL_NAME = 'myapp.MyQuotaModel'  # default: 'django_quotas.defaults.QuotaModel'
-   DJANGO_QUOTAS_RELATED_ACCOUNT_MODEL = 'auth.User'  # or your custom user/account model
+   DJANGO_QUOTAS_QUOTA_RELATED_ACCOUNT_MODEL_NAME = 'auth.User'  # or your custom user/account model
    ```
 
 3. **Run migrations:**

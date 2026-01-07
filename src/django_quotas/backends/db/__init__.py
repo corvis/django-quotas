@@ -5,9 +5,3 @@
 
 @package django_quotas.backend.db
 """
-
-__all__ = []
-
-#
-#  Copyright 2025 by Dmitry Berezovsky, MIT License
-#

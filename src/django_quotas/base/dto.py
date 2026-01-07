@@ -82,7 +82,7 @@ class QuotaStats:
     :param feature_stats: Mapping of feature names to their quota status.
     """
 
-    account_id: uuid.UUID
+    account_id: str
     feature_stats: dict[str, QuotaStatus]
 
     def has_exceeded_quotas(self) -> bool:

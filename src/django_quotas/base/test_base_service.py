@@ -7,15 +7,15 @@ Unit tests for QuotaService (django_quotas.base.service).
 
 from typing import Any, cast
 import unittest
-from unittest.mock import MagicMock, patch
+from unittest.mock import MagicMock
 import uuid
 
-from django_quotas.base.dto import Quota, QuotaBucket, QuotaStats, QuotaUseForBucket, ValuePerBucket
+from django_quotas.base.dto import Quota, QuotaBucket, QuotaStats, ValuePerBucket
 from django_quotas.base.service import QuotaExceededError, QuotaService
 
 __all__ = ["TestQuotaService"]
 
-ACCOUNT_ID: uuid.UUID = uuid.UUID("11111111-1111-1111-1111-111111111111")
+ACCOUNT_ID = "11111111-1111-1111-1111-111111111111"
 FEATURE_A = "feature_a"
 FEATURE_B = "feature_b"
 
@@ -25,27 +25,27 @@ class MockQuotaService(QuotaService):
 
     def __init__(self, utilization: QuotaStats) -> None:
         self._utilization = utilization
-        self.registered: list[tuple[uuid.UUID, str, int]] = []
+        self.registered: list[tuple[str, str, int]] = []
 
-    def register_usage(self, account_id: uuid.UUID, feature_name: str, increment: int = 1) -> None:
-        self.registered.append((account_id, feature_name, increment))
+    def register_usage(self, account_id: str, feature: str, increment: int = 1) -> None:
+        self.registered.append((account_id, feature, increment))
 
-    async def aregister_usage(self, account_id: uuid.UUID, feature_name: str | set[str], increment: int = 1) -> None:
-        self.registered.append((account_id, cast(str, feature_name), increment))
+    async def aregister_usage(self, account_id: str, feature: str | set[str], increment: int = 1) -> None:
+        self.registered.append((account_id, cast(str, feature), increment))
 
-    def get_quotas_utilization(self, account_id: uuid.UUID, feature_name: str | set[str] | None) -> QuotaStats:
+    def get_quotas_utilization(self, account_id: uuid.UUID, feature: str | set[str] | None) -> QuotaStats:
         return self._utilization
 
-    async def aget_quotas_utilization(self, account_id: uuid.UUID, feature_name: str | set[str] | None) -> QuotaStats:
+    async def aget_quotas_utilization(self, account_id: uuid.UUID, feature: str | set[str] | None) -> QuotaStats:
         return self._utilization
 
     def set_quota(
-        self, account_id: uuid.UUID, feature_name: str, limits: ValuePerBucket, owner_tag: str | None = None
+        self, account_id: uuid.UUID, feature: str, limits: ValuePerBucket, owner_tag: str | None = None
     ) -> Quota:
         raise NotImplementedError()
 
     async def aset_quota(
-        self, account_id: uuid.UUID, feature_name: str, limits: ValuePerBucket, owner_tag: str | None = None
+        self, account_id: uuid.UUID, feature: str, limits: ValuePerBucket, owner_tag: str | None = None
     ) -> Quota:
         raise NotImplementedError()
 
