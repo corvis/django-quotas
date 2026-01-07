@@ -1,5 +1,5 @@
 #
-#  Copyright 2025 by Dmitry Berezovsky, MIT License
+#  Copyright 2026 by Dmitry Berezovsky, MIT License
 #
 from functools import cached_property
 from typing import TYPE_CHECKING, Final

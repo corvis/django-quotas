@@ -1,5 +1,5 @@
 #
-#  Copyright 2025 by Dmitry Berezovsky, MIT License
+#  Copyright 2026 by Dmitry Berezovsky, MIT License
 #
 """
 Unit tests for QuotaService (django_quotas.base.service).

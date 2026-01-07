@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 #
-#  Copyright 2025 by Dmitry Berezovsky, MIT License
+#  Copyright 2026 by Dmitry Berezovsky, MIT License
 #
 """Django's command-line utility for administrative tasks."""
 

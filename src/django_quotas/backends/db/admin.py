@@ -1,5 +1,5 @@
 #
-#  Copyright 2025 by Dmitry Berezovsky, MIT License
+#  Copyright 2026 by Dmitry Berezovsky, MIT License
 #
 from django.contrib import admin
 from django.http import HttpRequest
