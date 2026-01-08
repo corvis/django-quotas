@@ -19,7 +19,7 @@ class BaseQuotaModel(models.Model):
         abstract = True
 
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-    owner_tag = models.CharField(max_length=300, null=True, blank=True)
+    owner_tag = models.CharField(max_length=300, null=True, blank=True, db_index=True)
     feature_name = models.CharField(max_length=300, null=False, blank=False)
     hourly_limit = models.IntegerField(null=True, blank=True)
     daily_limit = models.IntegerField(null=True, blank=True)
